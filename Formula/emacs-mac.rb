@@ -1,11 +1,8 @@
-# Documentation: https://docs.brew.sh/Formula-Cookbook
-#                https://rubydoc.brew.sh/Formula
-# PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
   license ""
-  head "https://github.com/choppsv1/emacs-mac.git" branch: main
+  head "https://github.com/choppsv1/emacs-mac.git"
 
   depends_on "autoconf"
   depends_on "automake"
@@ -28,17 +25,6 @@ class EmacsMac < Formula
   end
 
   def install
-    # OLD:
-
-    # ENV.deparallelize  # if your formula fails when building in parallel
-    # Remove unrecognized options if warned by configure
-    # https://rubydoc.brew.sh/Formula.html#std_configure_args-instance_method
-    system "./configure", *std_configure_args, "--disable-silent-rules"
-    system "make", "install" # if this fails, try separate make/make install steps
-
-    # NEW:
-
-
     args = [
       "--enable-locallisppath=#{HOMEBREW_PREFIX}/share/emacs/site-lisp",
       "--infodir=#{info}/emacs",
@@ -47,11 +33,11 @@ class EmacsMac < Formula
       "--enable-mac-app=#{prefix}",
       "--with-gnutls",
     ]
-    args << "--with-modules" unless build.without? "modules"
+    args << "--with-modules" if build.with? "modules"
     args << "--with-rsvg" if build.with? "rsvg"
     args << "--with-mac-metal" if build.with? "mac-metal"
 
-    icons_dir = buildpath/"mac/Emacs.app/Contents/Resources"
+    # icons_dir = buildpath/"mac/Emacs.app/Contents/Resources"
 
     system "./autogen.sh"
     system "./configure", *std_configure_args, *args
