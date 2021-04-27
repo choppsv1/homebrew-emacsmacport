@@ -1,20 +1,33 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  license ""
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.0.tar.gz"
+  version "27.2-mac-1.0"
+  sha256 "a4cb901f68fe8a9fb4928d8d4fecfd4643f127aa28a4d004f88b87688ad0ccb9"
   head "https://github.com/choppsv1/emacs-mac.git"
+
+  option "with-dbus", "Build with d-bus support"
+  option "without-modules", "Build without dynamic modules support"
+  option "with-rsvg", "Build with rsvg support"
+  option "with-ctags", "Don't remove the ctags executable that emacs provides"
+  # option "with-no-title-bars",
+  #        "Build with a patch for no title bars on frames (not recommended to use with --HEAD option)"
+  # option "with-natural-title-bar",
+  #        "Build with a patch for title bar color inferred by theme (not recommended to use with --HEAD option)"
+  option "with-starter", "Build with a starter script to start emacs GUI from CLI"
+  option "with-mac-metal", "use Metal framework in application-side double buffering (experimental)"
 
   depends_on "autoconf"
   depends_on "automake"
-  depends_on "d-bus" if build.with? "dbus"
   depends_on "gnutls"
-  depends_on "librsvg" if build.with? "rsvg"
   depends_on "pkg-config"
   depends_on "texinfo"
   depends_on "jansson" => :recommended
   depends_on "libxml2" => :recommended
+  depends_on "dbus" => :optional
   depends_on "glib" => :optional
   depends_on "imagemagick" => :optional
+  depends_on "librsvg" => :optional # if build.with? "rsvg"
 
   # patch for multi-tty support, see the following links for details
   # https://bitbucket.org/mituharu/emacs-mac/pull-requests/2/add-multi-tty-support-to-be-on-par-with/diff
