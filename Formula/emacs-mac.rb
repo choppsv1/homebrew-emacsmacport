@@ -1,19 +1,14 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.0.tar.gz"
-  version "27.2-mac-1.0"
-  sha256 "a4cb901f68fe8a9fb4928d8d4fecfd4643f127aa28a4d004f88b87688ad0ccb9"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.1.tar.gz"
+  version "27.2-mac-1.1"
+  sha256 "34768bf5d87f9cec7aa08ffff18f33cbeea2d99fa8502ec59d4f2bdaba570cf9"
   head "https://github.com/choppsv1/emacs-mac.git"
 
-  option "with-dbus", "Build with d-bus support"
   option "without-modules", "Build without dynamic modules support"
   option "with-rsvg", "Build with rsvg support"
   option "with-ctags", "Don't remove the ctags executable that emacs provides"
-  # option "with-no-title-bars",
-  #        "Build with a patch for no title bars on frames (not recommended to use with --HEAD option)"
-  # option "with-natural-title-bar",
-  #        "Build with a patch for title bar color inferred by theme (not recommended to use with --HEAD option)"
   option "with-starter", "Build with a starter script to start emacs GUI from CLI"
   option "with-mac-metal", "use Metal framework in application-side double buffering (experimental)"
 
@@ -24,8 +19,6 @@ class EmacsMac < Formula
   depends_on "texinfo"
   depends_on "jansson" => :recommended
   depends_on "libxml2" => :recommended
-  depends_on "dbus" => :optional
-  depends_on "glib" => :optional
   depends_on "imagemagick" => :optional
   depends_on "librsvg" => :optional # if build.with? "rsvg"
 
@@ -48,12 +41,11 @@ class EmacsMac < Formula
     ]
     args << "--with-modules" if build.with? "modules"
     args << "--with-rsvg" if build.with? "rsvg"
-    args << "--with-mac-metal" if build.with? "mac-metal"
 
     # icons_dir = buildpath/"mac/Emacs.app/Contents/Resources"
 
     system "./autogen.sh"
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args
     system "make"
     system "make", "install"
     prefix.install "NEWS-mac"
