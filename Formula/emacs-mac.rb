@@ -12,14 +12,15 @@ class EmacsMac < Formula
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "gnutls"
-  depends_on "imagemagick" => :optional
-  depends_on "jansson"
-  depends_on "libxml2" => :recommended
-  depends_on "librsvg" => :recommended
-  depends_on "mailutils" => :optional
+
   depends_on "pkg-config" => :build
+  depends_on "gnutls"
+  depends_on "jansson"
   depends_on "texinfo"
+  depends_on "librsvg" => :recommended
+  depends_on "libxml2" => :recommended
+  depends_on "imagemagick" => :optional
+  depends_on "mailutils" => :optional
 
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
