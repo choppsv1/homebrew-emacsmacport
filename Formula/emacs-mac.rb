@@ -1,26 +1,28 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.1.tar.gz"
-  version "27.2-mac-1.1"
-  sha256 "34768bf5d87f9cec7aa08ffff18f33cbeea2d99fa8502ec59d4f2bdaba570cf9"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.2.tar.gz"
+  version "27.2-mac-1.2"
+  sha256 "1f4fd6dd15ec50867915799f9e56cc22102eb2ac5c6357a8ca8483b56b199143"
   head "https://github.com/choppsv1/emacs-mac.git"
 
   option "without-modules", "Build without dynamic modules support"
-  option "with-rsvg", "Build with rsvg support"
   option "with-ctags", "Don't remove the ctags executable that emacs provides"
-  option "with-starter", "Build with a starter script to start emacs GUI from CLI"
-  option "with-mac-metal", "use Metal framework in application-side double buffering (experimental)"
+  option "without-starter", "Build without a starter script to start emacs GUI from CLI"
 
-  depends_on "autoconf"
-  depends_on "automake"
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "pkg-config" => :build
   depends_on "gnutls"
-  depends_on "pkg-config"
+  depends_on "jansson"
   depends_on "texinfo"
-  depends_on "jansson" => :recommended
+  depends_on "librsvg" => :recommended
   depends_on "libxml2" => :recommended
   depends_on "imagemagick" => :optional
-  depends_on "librsvg" => :optional # if build.with? "rsvg"
+  depends_on "mailutils" => :optional
+
+  uses_from_macos "libxml2"
+  uses_from_macos "ncurses"
 
   # patch for multi-tty support, see the following links for details
   # https://bitbucket.org/mituharu/emacs-mac/pull-requests/2/add-multi-tty-support-to-be-on-par-with/diff
@@ -32,17 +34,19 @@ class EmacsMac < Formula
 
   def install
     args = [
+      "--disable-silent-rules",
       "--enable-locallisppath=#{HOMEBREW_PREFIX}/share/emacs/site-lisp",
+      "--enable-mac-app=#{prefix}",
       "--infodir=#{info}/emacs",
       "--prefix=#{prefix}",
-      "--with-mac",
-      "--enable-mac-app=#{prefix}",
       "--with-gnutls",
+      "--with-mac",
+      "--with-xml2",
     ]
+    args << "--with-imagemagick" if build.with? "imagemagick"
     args << "--with-modules" if build.with? "modules"
-    args << "--with-rsvg" if build.with? "rsvg"
-
-    # icons_dir = buildpath/"mac/Emacs.app/Contents/Resources"
+    args << "--without-pop" if build.with? "mailutils"
+    args << "--with-rsvg" if build.with? "librsvg"
 
     system "./autogen.sh"
     system "./configure", *args
