@@ -1,9 +1,9 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.4.tar.gz"
-  version "27.2-mac-1.4"
-  sha256 "200ef9ee36325453ec5699616aa169a87b6ce65127193ac8e5dc08ef8db99c0c"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.5.tar.gz"
+  version "27.2-mac-1.5"
+  sha256 "275430584365c4f485b1f6ef2a66d8a9738cab1b3d867a224d1d908ed0140fc6"
   head "https://github.com/choppsv1/emacs-mac.git"
 
   option "without-modules", "Build without dynamic modules support"
