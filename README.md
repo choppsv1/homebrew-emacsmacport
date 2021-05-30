@@ -10,7 +10,7 @@ support to it.
 
 When one does `(require 'mac-notifications)` the notification support is loaded.
 Additionally the standard `notifications-notify` is redirected to these native
-[notifications. This means packages such as `org-notify` and `mu4e-alert` will
+notifications. This means packages such as `org-notify` and `mu4e-alert` will
 Just Work.
 
 Org, mu4e and erc users, Enjoy.

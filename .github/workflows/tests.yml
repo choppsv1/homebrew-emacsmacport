@@ -8,9 +8,16 @@ jobs:
   test-bot:
     strategy:
       matrix:
+        # os: ["11-arm64", "11", "10.15", "10.14"]
         os: [macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Check whether ARM tests will be forced
+        if: needs.tap_syntax.outputs.skip-arm-tests
+        run: echo 'HOMEBREW_REQUIRE_BOTTLED_ARM=1' >> $GITHUB_ENV
+      - name: Force vendored Ruby on Catalina
+        if: matrix.version == '10.15'
+        run: echo 'HOMEBREW_FORCE_VENDOR_RUBY=1' >> $GITHUB_ENV
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -33,7 +40,10 @@ jobs:
 
       - run: brew test-bot --only-tap-syntax
 
-      - run: brew test-bot --only-formulae
+      - run: brew install --build-bottle ./Formula/emacs-mac.rb
+        if: github.event_name == 'pull_request'
+
+      - run: brew bottle ./Formula/emacs-mac.rb
         if: github.event_name == 'pull_request'
 
       - name: Upload bottles as artifact
@@ -42,3 +52,6 @@ jobs:
         with:
           name: bottles
           path: '*.bottle.*'
+
+      - run: brew test-bot --only-cleanup-after
+        if: always()
