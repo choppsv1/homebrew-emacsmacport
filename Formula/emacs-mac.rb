@@ -1,22 +1,24 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.6.tar.gz"
-  version "27.2-mac-1.6"
-  sha256 "de3b28f1af9e1646f37b1a1deffbf1826bcca0e62a3805461e68a5ee87a06542"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.7.tar.gz"
+  version "27.2-mac-1.7"
+  sha256 "93222f866a2d3cd22c934c8f1c9ec74b910ed9ceee225e066e966c8a35586694"
+  license "GPL-3.0-or-later"
+
   head "https://github.com/choppsv1/emacs-mac.git"
 
   option "without-modules", "Build without dynamic modules support"
-  option "with-ctags", "Don't remove the ctags executable that emacs provides"
   option "without-starter", "Build without a starter script to start emacs GUI from CLI"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
+  depends_on "gnu-sed" => :build
 
   depends_on "pkg-config" => :build
+  depends_on "texinfo" => :build
   depends_on "gnutls"
   depends_on "jansson"
-  depends_on "texinfo"
   depends_on "librsvg" => :recommended
   depends_on "libxml2" => :recommended
   depends_on "imagemagick" => :optional
@@ -34,6 +36,11 @@ class EmacsMac < Formula
   end
 
   def install
+    # Mojave uses the Catalina SDK which causes issues like
+    # https://github.com/Homebrew/homebrew-core/issues/46393
+    # https://github.com/Homebrew/homebrew-core/pull/70421
+    ENV["ac_cv_func_aligned_alloc"] = "no" if MacOS.version == :mojave
+
     args = [
       "--disable-silent-rules",
       "--enable-locallisppath=#{HOMEBREW_PREFIX}/share/emacs/site-lisp",
@@ -49,7 +56,18 @@ class EmacsMac < Formula
     args << "--without-pop" if build.with? "mailutils"
     args << "--with-rsvg" if build.with? "librsvg"
 
+    ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
+
     system "./autogen.sh"
+
+    File.write "lisp/site-load.el", <<~EOS
+      (setq exec-path (delete nil
+        (mapcar
+          (lambda (elt)
+            (unless (string-match-p "Homebrew/shims" elt) elt))
+          exec-path)))
+    EOS
+
     system "./configure", *args
     system "make"
     system "make", "install"
@@ -57,10 +75,8 @@ class EmacsMac < Formula
 
     # Follow Homebrew and don't install ctags from Emacs. This allows Vim
     # and Emacs and exuberant ctags to play together without violence.
-    if build.without? "ctags"
-      (bin/"ctags").unlink
-      (share/man/man1/"ctags.1.gz").unlink
-    end
+    (bin/"ctags").unlink
+    (share/man/man1/"ctags.1.gz").unlink
 
     if build.with? "starter"
       # Replace the symlink with one that starts GUI
