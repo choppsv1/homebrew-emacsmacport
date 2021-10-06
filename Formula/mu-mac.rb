@@ -4,8 +4,8 @@
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/archive/refs/tags/1.6.5.tar.gz"
-  sha256 "d92cf9a1fba2ec008f975b14c92066cd668e923bee564890a39b8250e438b606"
+  url "https://github.com/djcb/mu/archive/refs/tags/1.6.6.tar.gz"
+  sha256 "23f4374a4dc967985d829c753f94a6720a692c2d800eb07b36fe8e275344dcf4"
   license "GPL-3.0-or-later"
 
   # We restrict matching to versions with an even-numbered minor version number,
