@@ -4,8 +4,8 @@
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/archive/refs/tags/1.6.6.tar.gz"
-  sha256 "23f4374a4dc967985d829c753f94a6720a692c2d800eb07b36fe8e275344dcf4"
+  url "https://github.com/djcb/mu/releases/download/1.6.10/mu-1.6.10.tar.xz"
+  sha256 "0bc224aab2bfe40b5209af14e0982e637789292b7979872658d4498b29e900b6"
   license "GPL-3.0-or-later"
 
   # We restrict matching to versions with an even-numbered minor version number,
@@ -17,13 +17,16 @@ class MuMac < Formula
   end
 
   head do
-    url "https://github.com/djcb/mu.git"
+    # a51272a2e658cfe2a10c049109f1b6ea6b3ba55c
+    url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
+    # 1.7.9 :revision => "a51272a2e6"
+   
 
+    depends_on "autoconf" => :build
     depends_on "autoconf-archive" => :build
+    depends_on "automake" => :build
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
   depends_on "emacs-mac" => :build
   depends_on "libgpg-error" => :build
   depends_on "libtool" => :build
@@ -35,11 +38,17 @@ class MuMac < Formula
 
   uses_from_macos "texinfo" => :build
 
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
+
   def install
-    system "autoreconf", "-ivf"
+    system "autoreconf", "-ivf" if build.head?
     ENV["EMACS"] = "/opt/homebrew/bin/emacs"
     system "./configure", "--disable-dependency-tracking",
-                          "--enable-mu4e",
+                          "--disable-guile",
                           "--prefix=#{prefix}",
                           "--with-lispdir=#{elisp}"
     system "make", "V=1"
