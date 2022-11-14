@@ -18,19 +18,21 @@ class MuMac < Formula
 
   head do
     # a51272a2e658cfe2a10c049109f1b6ea6b3ba55c
-    url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
+    # url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
+    # url "https://github.com/djcb/mu.git", :revision => "d7e13a34"
+    url "https://github.com/djcb/mu.git"
     # 1.7.9 :revision => "a51272a2e6"
-   
+    # 1.7.12 :revision => "d7e13a34"
 
-    depends_on "autoconf" => :build
-    depends_on "autoconf-archive" => :build
-    depends_on "automake" => :build
+    depends_on "meson" => :build
+    depends_on "ninja" => :build
   end
 
   depends_on "emacs-mac" => :build
   depends_on "libgpg-error" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
+  depends_on "autoconf"
   depends_on "gettext"
   depends_on "glib"
   depends_on "gmime"
@@ -45,14 +47,16 @@ class MuMac < Formula
   fails_with gcc: "5"
 
   def install
-    system "autoreconf", "-ivf" if build.head?
-    ENV["EMACS"] = "/opt/homebrew/bin/emacs"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-guile",
-                          "--prefix=#{prefix}",
-                          "--with-lispdir=#{elisp}"
-    system "make", "V=1"
-    system "make", "V=1", "install"
+    # system "meson", *std_meson_args, "-Dintrospection=true", "-Ddocs=false", ".."
+    # system "./autogen.sh", "-Dlispdir=#{elisp}"
+    # system "./autogen.sh", "--disable-guile"
+    system "./autogen.sh", "-Dprefix=#{prefix}", "-Dguile=disabled"
+
+    # # system "meson", *std_meson_args, ".."
+    # system "ninja", "-C", "build"
+    system "make"
+    system "make install"
+    # system "ninja", "install", "-v"
   end
 
   def caveats; <<~EOS

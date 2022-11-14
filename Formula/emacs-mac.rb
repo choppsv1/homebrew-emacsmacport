@@ -1,9 +1,9 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.7.tar.gz"
-  version "27.2-mac-1.7"
-  sha256 "93222f866a2d3cd22c934c8f1c9ec74b910ed9ceee225e066e966c8a35586694"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.0-mac-1.1.tar.gz"
+  version "28.0-mac-1.1"
+  sha256 "2db93bc432a42e66cb03619cb1d4f0396268baed9a550598cea3550576639f7a"
   license "GPL-3.0-or-later"
 
   head "https://github.com/choppsv1/emacs-mac.git"
@@ -19,6 +19,7 @@ class EmacsMac < Formula
   depends_on "texinfo" => :build
   depends_on "gnutls"
   depends_on "jansson"
+  # depends_on "libgccjit"
   depends_on "librsvg" => :recommended
   depends_on "libxml2" => :recommended
   depends_on "imagemagick" => :optional
@@ -47,6 +48,7 @@ class EmacsMac < Formula
       "--enable-mac-app=#{prefix}",
       "--infodir=#{info}/emacs",
       "--prefix=#{prefix}",
+      "--with-native-compilation=no",
       "--with-gnutls",
       "--with-mac",
       "--with-xml2",
@@ -67,6 +69,8 @@ class EmacsMac < Formula
             (unless (string-match-p "Homebrew/shims" elt) elt))
           exec-path)))
     EOS
+
+    # EMACSAPP=/opt/APP ; ./configure --with-mac --with-xml2 --with-json --with-modules --prefix=$EMACSAPP/Emacs.app/Contents/MacOS --enable-mac-app=$EMACSAPP && make -j 8
 
     system "./configure", *args
     system "make"
