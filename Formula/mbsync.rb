@@ -6,10 +6,7 @@ class Mbsync < Formula
   license "GPL-2.0-or-later"
   head "https://git.code.sf.net/p/isync/isync.git", branch: "master"
 
-  patch do
-    url "file:///opt/homebrew/Library/Taps/choppsv1/homebrew-emacsmacport/add-apple-xoauth2.patch"
-    sha256 "270c6dab4f397847001ae9a55689e71b4d7c0aa7c0a1bb73942467afe191fd61"
-  end
+  patch :DATA
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -50,3 +47,22 @@ class Mbsync < Formula
     system bin/"mbsync-get-cert", "duckduckgo.com:443"
   end
 end
+__END__
+--- a/src/drv_imap.c	2021-12-03 10:56:16.000000000 +0000
++++ b/src/drv_imap.c	2022-03-04 02:37:25.000000000 +0000
+@@ -2195,6 +2195,7 @@
+ 	{ SASL_CB_USER,     NULL, NULL },
+ 	{ SASL_CB_AUTHNAME, NULL, NULL },
+ 	{ SASL_CB_PASS,     NULL, NULL },
++        { SASL_CB_OAUTH2_BEARER_TOKEN, NULL, NULL },
+ 	{ SASL_CB_LIST_END, NULL, NULL }
+ };
+ 
+@@ -2212,6 +2213,7 @@
+ 			val = ensure_user( srvc );
+ 			break;
+ 		case SASL_CB_PASS:
++                case SASL_CB_OAUTH2_BEARER_TOKEN:
+ 			val = ensure_password( srvc );
+ 			break;
+ 		default:
