@@ -1,9 +1,9 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/27.2-mac-1.7.tar.gz"
-  version "27.2-mac-1.7"
-  sha256 "93222f866a2d3cd22c934c8f1c9ec74b910ed9ceee225e066e966c8a35586694"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.2-mac-1.0.tar.gz"
+  version "28.2-mac-1.0"
+  sha256 "3c19aeef4307f1867e9932149c5ba755808de61a362caa5ff86b37a57becad47"
   license "GPL-3.0-or-later"
 
   head "https://github.com/choppsv1/emacs-mac.git"
