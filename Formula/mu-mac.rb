@@ -4,8 +4,8 @@
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/releases/download/1.6.10/mu-1.6.10.tar.xz"
-  sha256 "0bc224aab2bfe40b5209af14e0982e637789292b7979872658d4498b29e900b6"
+  url "https://github.com/djcb/mu/releases/download/v1.8.14/mu-1.8.14.tar.xz"
+  sha256 "1a9c5e15b5e8b67622f7e58dfadd453abf232c0b715bd5f89b955e704455219c"
   license "GPL-3.0-or-later"
 
   # We restrict matching to versions with an even-numbered minor version number,
@@ -17,10 +17,9 @@ class MuMac < Formula
   end
 
   head do
-    # a51272a2e658cfe2a10c049109f1b6ea6b3ba55c
-    url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
     # 1.7.9 :revision => "a51272a2e6"
-   
+    # url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
+    url "https://github.com/djcb/mu.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "autoconf-archive" => :build
@@ -30,13 +29,21 @@ class MuMac < Formula
   depends_on "emacs-mac" => :build
   depends_on "libgpg-error" => :build
   depends_on "libtool" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "gmime"
   depends_on "xapian"
 
-  uses_from_macos "texinfo" => :build
+  on_system :linux, macos: :ventura_or_newer do
+    uses_from_macos "texinfo" => :build
+  end
+
+  conflicts_with "mu-repo", because: "both install `mu` binaries"
+
+  fails_with gcc: "5"
 
   on_linux do
     depends_on "gcc"
@@ -44,16 +51,27 @@ class MuMac < Formula
 
   fails_with gcc: "5"
 
+# My old 
+#  def install
+#    system "autoreconf", "-ivf" if build.head?
+#    ENV["EMACS"] = "/opt/homebrew/bin/emacs"
+#    system "./configure", "--disable-dependency-tracking",
+#                          "--disable-guile",
+#                          "--prefix=#{prefix}",
+#                          "--with-lispdir=#{elisp}"
+#    system "make", "V=1"
+#    system "make", "V=1", "install"
+#  end
+
+  # from 1.8 formula
   def install
-    system "autoreconf", "-ivf" if build.head?
-    ENV["EMACS"] = "/opt/homebrew/bin/emacs"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-guile",
-                          "--prefix=#{prefix}",
-                          "--with-lispdir=#{elisp}"
-    system "make", "V=1"
-    system "make", "V=1", "install"
+    mkdir "build" do
+      system "meson", *std_meson_args, "-Dlispdir=#{elisp}", ".."
+      system "ninja", "-v"
+      system "ninja", "install", "-v"
+    end
   end
+
 
   def caveats; <<~EOS
     Existing mu users are recommended to run the following after upgrading:
