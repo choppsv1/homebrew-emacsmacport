@@ -1,0 +1,57 @@
+diff -u -H -r --exclude=*.perspectivev3 --exclude=*.pbxproj --exclude=*.pbxuser --exclude=*.bak --exclude=*~ --exclude=*.o --exclude=.* --exclude=obj* -I Copyright --exclude=*.log -I \$Id.*\$ emacs-mac-28.3-mac-1.0.orig/lisp/server.el emacs-mac-28.3-mac-1.0/lisp/server.el
+--- emacs-mac-28.3-mac-1.0.orig/lisp/server.el  2023-07-12 09:33:12
++++ emacs-mac-28.3-mac-1.0/lisp/server.el       2023-07-12 11:37:01
+@@ -1217,10 +1217,9 @@
+                  ;; choice there.)  In daemon mode on Windows, we can't
+                  ;; make tty frames, so force the frame type to GUI
+                  ;; there too.
+-                 (when (or (and (eq system-type 'windows-nt)
+-                                (or (daemonp)
+-                                    (eq window-system 'w32)))
+-                           (eq window-system 'mac))
++                 (when (and (eq system-type 'windows-nt)
++                            (or (daemonp)
++                                (eq window-system 'w32)))
+                    (push "-window-system" args-left)))
+
+                 ;; -position +LINE[:COLUMN]:  Set point to the given
+Only in emacs-mac-28.3-mac-1.0/lisp: server.el.orig
+diff -u -H -r --exclude=*.perspectivev3 --exclude=*.pbxproj --exclude=*.pbxuser --exclude=*.bak --exclude=*~ --exclude=*.o --exclude=.* --exclude=obj* -I Copyright --exclude=*.log -I \$Id.*\$ emacs-mac-28.3-mac-1.0.orig/src/frame.c emacs-mac-28.3-mac-1.0/src/frame.c
+--- emacs-mac-28.3-mac-1.0.orig/src/frame.c     2023-07-12 09:33:12
++++ emacs-mac-28.3-mac-1.0/src/frame.c  2023-07-12 11:37:01
+@@ -1343,12 +1343,8 @@
+     emacs_abort ();
+ #else /* not MSDOS */
+
+-#if defined WINDOWSNT || defined HAVE_MACGUI /* This should work now! */
+-  if (sf->output_method != output_termcap
+-#ifdef HAVE_MACGUI
+-      && sf->output_method != output_initial
+-#endif
+-      )
++#ifdef WINDOWSNT /* This should work now! */
++  if (sf->output_method != output_termcap)
+     error ("Not using an ASCII terminal now; cannot make a new ASCII frame");
+ #endif
+ #endif /* not MSDOS */
+Only in emacs-mac-28.3-mac-1.0/src: frame.c.orig
+diff -u -H -r --exclude=*.perspectivev3 --exclude=*.pbxproj --exclude=*.pbxuser --exclude=*.bak --exclude=*~ --exclude=*.o --exclude=.* --exclude=obj* -I Copyright --exclude=*.log -I \$Id.*\$ emacs-mac-28.3-mac-1.0.orig/src/macterm.c emacs-mac-28.3-mac-1.0/src/macterm.c
+--- emacs-mac-28.3-mac-1.0.orig/src/macterm.c   2023-07-12 09:33:12
++++ emacs-mac-28.3-mac-1.0/src/macterm.c        2023-07-12 11:41:08
+@@ -2939,6 +2939,7 @@
+ {
+   struct frame *f1;
+   struct mac_display_info *dpyinfo = FRAME_DISPLAY_INFO (*fp);
++  struct frame *sf = SELECTED_FRAME ();
+
+   block_input ();
+
+@@ -2971,7 +2972,7 @@
+        f1 = XFRAME (mac_event_frame ());
+     }
+
+-  if (f1)
++  if (f1 && sf->output_method != output_termcap)
+     {
+       /* Ok, we found a frame.  Store all the values.
+         last_mouse_glyph is a rectangle used to reduce the generation

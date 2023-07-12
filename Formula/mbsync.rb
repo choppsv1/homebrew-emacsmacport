@@ -4,14 +4,18 @@ class Mbsync < Formula
   url "https://downloads.sourceforge.net/project/isync/isync/1.4.4/isync-1.4.4.tar.gz"
   sha256 "7c3273894f22e98330a330051e9d942fd9ffbc02b91952c2f1896a5c37e700ff"
   license "GPL-2.0-or-later"
-  head "https://git.code.sf.net/p/isync/isync.git", branch: "master"
+  revision 1
 
   patch :DATA
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "berkeley-db"
-  depends_on "openssl@1.1"
+  head do
+    url "https://git.code.sf.net/p/isync/isync.git", branch: "master"
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+  end
+
+  depends_on "berkeley-db@5"
+  depends_on "openssl@3"
 
   uses_from_macos "zlib"
 
@@ -22,15 +26,16 @@ class Mbsync < Formula
     else
       system "autoreconf", "-fiv"
     end
-
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --disable-silent-rules
-    ]
-
-    system "./configure", *args
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
+
+    # args = %W[
+    #   --disable-dependency-tracking
+    #   --prefix=#{prefix}
+    #   --disable-silent-rules
+    # ]
+    # system "./configure", *args
+
   end
 
   service do

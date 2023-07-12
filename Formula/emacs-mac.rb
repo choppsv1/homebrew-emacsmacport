@@ -1,24 +1,35 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.2-mac-1.0.tar.gz"
-  version "28.2-mac-1.0"
-  sha256 "3c19aeef4307f1867e9932149c5ba755808de61a362caa5ff86b37a57becad47"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.3-mac-1.0.tar.gz"
+  version "28.3-mac-1.0"
+  sha256 "ed5fcb3a12fbee28f5f9fe520866f5a982a693f0d978fd20a1e20fdd06f23049"
   license "GPL-3.0-or-later"
 
-  head "https://github.com/choppsv1/emacs-mac.git"
+  head do
+    url "https://github.com/choppsv1/emacs-mac.git", :branch => "add-new-notifications"
+  end
 
   option "without-modules", "Build without dynamic modules support"
   option "without-starter", "Build without a starter script to start emacs GUI from CLI"
 
+  option "without-native-comp", "Build without native compilation"
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
+  depends_on "awk" => :build
   depends_on "gnu-sed" => :build
-
+  depends_on "gnu-tar" => :build
+  depends_on "grep" => :build
+  depends_on "make" => :build
+  depends_on "coreutils" => :build
   depends_on "pkg-config" => :build
   depends_on "texinfo" => :build
+  depends_on "xz" => :build
+
   depends_on "gnutls"
   depends_on "jansson"
+  depends_on "little-cms2"
   depends_on "librsvg" => :recommended
   depends_on "libxml2" => :recommended
   depends_on "imagemagick" => :optional
@@ -26,6 +37,15 @@ class EmacsMac < Formula
 
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
+
+  # with nativecomp
+  if build.with? "native-comp"
+    depends_on "libgccjit"
+    depends_on "gcc" => :build
+    depends_on "gmp" => :build
+    depends_on "libjpeg" => :build
+    depends_on "zlib" => :build
+  end
 
   # patch for multi-tty support, see the following links for details
   # https://bitbucket.org/mituharu/emacs-mac/pull-requests/2/add-multi-tty-support-to-be-on-par-with/diff
@@ -38,7 +58,7 @@ class EmacsMac < Formula
   def install
     # Mojave uses the Catalina SDK which causes issues like
     # https://github.com/Homebrew/homebrew-core/issues/46393
-    # https://github.com/Homebrew/homebrew-core/pull/70421
+    # https://github.com/Homebrew/homebrew-core/pull/70420
     ENV["ac_cv_func_aligned_alloc"] = "no" if MacOS.version == :mojave
 
     args = [
@@ -56,6 +76,8 @@ class EmacsMac < Formula
     args << "--without-pop" if build.with? "mailutils"
     args << "--with-rsvg" if build.with? "librsvg"
 
+    args << "--with-native-compilation" if build.with? "native-comp"
+
     ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
 
     system "./autogen.sh"
@@ -67,6 +89,11 @@ class EmacsMac < Formula
             (unless (string-match-p "Homebrew/shims" elt) elt))
           exec-path)))
     EOS
+
+    # Necessary for libgccjit library discovery
+    ENV.append "CPATH", "-I#{Formula["libgccjit"].opt_include}" if build.with? "native-comp"
+    ENV.append "LIBRARY_PATH", "-L#{Formula["libgccjit"].opt_lib}" if build.with? "native-comp"
+    ENV.append "LDFLAGS", "-L#{Formula["libgccjit"].opt_lib}" if build.with? "native-comp"
 
     system "./configure", *args
     system "make"
