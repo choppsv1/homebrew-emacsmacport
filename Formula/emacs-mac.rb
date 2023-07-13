@@ -1,9 +1,9 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.3-mac-1.1.tar.gz"
-  version "28.3-mac-1.1"
-  sha256 "89a418659754e3d0ee7352f121f76ef2da0362c3fb84b0ebce12b3743fccc399"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.2-mac-1.1.tar.gz"
+  version "28.2-mac-1.1"
+  sha256 "7dadf83581206e388435c7869165e53b4b0b0efa72943dbc2ab050e2fb62f7bc"
   license "GPL-3.0-or-later"
 
   head do
@@ -53,9 +53,14 @@ class EmacsMac < Formula
   # patch for multi-tty support, see the following links for details
   # https://bitbucket.org/mituharu/emacs-mac/pull-requests/2/add-multi-tty-support-to-be-on-par-with/diff
   # https://ylluminarious.github.io/2019/05/23/how-to-fix-the-emacs-mac-port-for-multi-tty-access/
+  # patch do
+  #   url "https://raw.githubusercontent.com/choppsv1/homebrew-emacsmacport/main/patches/multi-tty-28.diff"
+  #   sha256 "e5fc921fe979d08b1742eaeb0f933af48a536905cc27acbde5274dc4dd79bb85"
+  # end
+
   patch do
-    url "https://raw.githubusercontent.com/choppsv1/homebrew-emacsmacport/main/patches/multi-tty-28.diff"
-    sha256 "e5fc921fe979d08b1742eaeb0f933af48a536905cc27acbde5274dc4dd79bb85"
+    url "https://raw.githubusercontent.com/railwaycat/homebrew-emacsmacport/667f0efc08506facfc6963ac1fd1d5b9b777e094/patches/multi-tty-27.diff"
+    sha256 "5a13e83e79ce9c4a970ff0273e9a3a07403cc07f7333a0022b91c191200155a1"
   end
 
   def install
