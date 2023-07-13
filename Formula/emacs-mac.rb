@@ -1,9 +1,9 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.3-mac-1.0.tar.gz"
-  version "28.3-mac-1.0"
-  sha256 "ed5fcb3a12fbee28f5f9fe520866f5a982a693f0d978fd20a1e20fdd06f23049"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.3-mac-1.1.tar.gz"
+  version "28.3-mac-1.1"
+  sha256 "89a418659754e3d0ee7352f121f76ef2da0362c3fb84b0ebce12b3743fccc399"
   license "GPL-3.0-or-later"
 
   head do
@@ -13,7 +13,7 @@ class EmacsMac < Formula
   option "without-modules", "Build without dynamic modules support"
   option "without-starter", "Build without a starter script to start emacs GUI from CLI"
 
-  option "without-native-comp", "Build without native compilation"
+  option "with-native-comp", "Build without native compilation"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -40,6 +40,9 @@ class EmacsMac < Formula
 
   # with nativecomp
   if build.with? "native-comp"
+    fails_with :clang do
+      cause "Can't use clang for nativecomp"
+    end
     depends_on "libgccjit"
     depends_on "gcc" => :build
     depends_on "gmp" => :build
@@ -51,8 +54,8 @@ class EmacsMac < Formula
   # https://bitbucket.org/mituharu/emacs-mac/pull-requests/2/add-multi-tty-support-to-be-on-par-with/diff
   # https://ylluminarious.github.io/2019/05/23/how-to-fix-the-emacs-mac-port-for-multi-tty-access/
   patch do
-    url "https://raw.githubusercontent.com/railwaycat/homebrew-emacsmacport/667f0efc08506facfc6963ac1fd1d5b9b777e094/patches/multi-tty-27.diff"
-    sha256 "5a13e83e79ce9c4a970ff0273e9a3a07403cc07f7333a0022b91c191200155a1"
+    url "https://raw.githubusercontent.com/choppsv1/homebrew-emacsmacport/main/patches/multi-tty-28.diff"
+    sha256 "e5fc921fe979d08b1742eaeb0f933af48a536905cc27acbde5274dc4dd79bb85"
   end
 
   def install
@@ -70,6 +73,9 @@ class EmacsMac < Formula
       "--with-gnutls",
       "--with-mac",
       "--with-xml2",
+      "--with-xpm=ifavailable",
+      "--without-x",
+      "--without-dbus",
     ]
     args << "--with-imagemagick" if build.with? "imagemagick"
     args << "--with-modules" if build.with? "modules"
@@ -90,13 +96,16 @@ class EmacsMac < Formula
           exec-path)))
     EOS
 
+    # export CC="gcc -I$(brew --prefix libgccjit)/include"; export CPATH=/opt/homebrew/bin/gcc-13; export LDFLAGS=-L$(brew --prefix libgccjit)/lib/gcc/current; export LIBRARY_PATH=$(brew --prefix libgccjit)/lib/gcc/current EMACSAPP=/opt/APP ; ./configure
+
     # Necessary for libgccjit library discovery
+    #ENV["CC"] = "/usr/bin/gcc"
     ENV.append "CPATH", "-I#{Formula["libgccjit"].opt_include}" if build.with? "native-comp"
-    ENV.append "LIBRARY_PATH", "-L#{Formula["libgccjit"].opt_lib}" if build.with? "native-comp"
-    ENV.append "LDFLAGS", "-L#{Formula["libgccjit"].opt_lib}" if build.with? "native-comp"
+    ENV.append "LIBRARY_PATH", "#{Formula["libgccjit"].opt_lib}/gcc/current" if build.with? "native-comp"
+    ENV.append "LDFLAGS", "-L#{Formula["libgccjit"].opt_lib}/gcc/current" if build.with? "native-comp"
 
     system "./configure", *args
-    system "make"
+    system "make -j 10"
     system "make", "install"
     prefix.install "NEWS-mac"
 
