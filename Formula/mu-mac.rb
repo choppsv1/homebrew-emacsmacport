@@ -1,20 +1,12 @@
 # NOTE: Odd release numbers indicate unstable releases.
-# Please only submit PRs for [x.even.x] version numbers:
+# Please only submit PRs for [x.x.even] version numbers:
 # https://github.com/djcb/mu/commit/23f4a64bdcdee3f9956a39b9a5a4fd0c5c2370ba
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/releases/download/v1.10.5/mu-1.10.5.tar.xz"
-  sha256 "1af693dc19d6980f743b98494ab6db97656b6954e7edff343ceb62e65ca5cc2d"
+  url "https://github.com/djcb/mu/releases/download/v1.8.14/mu-1.8.14.tar.xz"
+  sha256 "1a9c5e15b5e8b67622f7e58dfadd453abf232c0b715bd5f89b955e704455219c"
   license "GPL-3.0-or-later"
-  head do
-    # url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
-    url "https://github.com/djcb/mu.git", branch: "master"
-
-    depends_on "autoconf" => :build
-    depends_on "autoconf-archive" => :build
-    depends_on "automake" => :build
-  end
 
   # We restrict matching to versions with an even-numbered minor version number,
   # as an odd-numbered minor version number indicates a development version:
@@ -22,6 +14,16 @@ class MuMac < Formula
   livecheck do
     url :stable
     regex(/^v?(\d+\.\d*[02468](?:\.\d+)*)$/i)
+  end
+
+  head do
+    # 1.7.9 :revision => "a51272a2e6"
+    # url "https://github.com/djcb/mu.git", :revision => "6becc657c11884c1d4a536e3e829728a9467da54"
+    url "https://github.com/djcb/mu.git", branch: "master"
+
+    depends_on "autoconf" => :build
+    depends_on "autoconf-archive" => :build
+    depends_on "automake" => :build
   end
 
   depends_on "emacs-mac" => :build
@@ -33,14 +35,19 @@ class MuMac < Formula
   depends_on "gettext"
   depends_on "glib"
   depends_on "gmime"
-  depends_on "guile" # Possible opportunistic linkage. TODO: Check if this can be removed.
   depends_on "xapian"
 
   on_system :linux, macos: :ventura_or_newer do
-    depends_on "texinfo" => :build
+    uses_from_macos "texinfo" => :build
   end
 
   conflicts_with "mu-repo", because: "both install `mu` binaries"
+
+  fails_with gcc: "5"
+
+  on_linux do
+    depends_on "gcc"
+  end
 
   fails_with gcc: "5"
 
