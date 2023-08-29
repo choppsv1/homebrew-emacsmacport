@@ -10,10 +10,10 @@ class Mbsync < Formula
 
   head do
     url "https://git.code.sf.net/p/isync/isync.git", branch: "master"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
   end
 
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
   depends_on "berkeley-db@5"
   depends_on "openssl@3"
 
