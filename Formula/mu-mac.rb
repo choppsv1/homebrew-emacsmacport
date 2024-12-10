@@ -4,8 +4,8 @@
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/releases/download/v1.8.14/mu-1.8.14.tar.xz"
-  sha256 "1a9c5e15b5e8b67622f7e58dfadd453abf232c0b715bd5f89b955e704455219c"
+  url "https://github.com/djcb/mu/releases/download/v1.12.7/mu-1.12.7.tar.xz"
+  sha256 "d916ba9b8ada90996b37eedf7f5fc70c35eb77f47fd933a502fbe0dccf2a6529"
   license "GPL-3.0-or-later"
 
   # We restrict matching to versions with an even-numbered minor version number,
@@ -32,14 +32,11 @@ class MuMac < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "texinfo" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "gmime"
   depends_on "xapian"
-
-  on_system :linux, macos: :ventura_or_newer do
-    uses_from_macos "texinfo" => :build
-  end
 
   conflicts_with "mu-repo", because: "both install `mu` binaries"
 
@@ -48,8 +45,6 @@ class MuMac < Formula
   on_linux do
     depends_on "gcc"
   end
-
-  fails_with gcc: "5"
 
 # My old
 #  def install
@@ -63,15 +58,20 @@ class MuMac < Formula
 #    system "make", "V=1", "install"
 #  end
 
-  # from 1.8 formula
-  def install
-    mkdir "build" do
-      system "meson", *std_meson_args, "-Dlispdir=#{elisp}", ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
-  end
+  # # from 1.8 formula
+  # def install
+  #   mkdir "build" do
+  #     system "meson", *std_meson_args, "-Dlispdir=#{elisp}", ".."
+  #     system "ninja", "-v"
+  #     system "ninja", "install", "-v"
+  #   end
+  # end
 
+  def install
+    system "meson", "setup", "build", "-Dlispdir=#{elisp}", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
+  end
 
   def caveats; <<~EOS
     Existing mu users are recommended to run the following after upgrading:
@@ -106,8 +106,8 @@ class MuMac < Formula
       This used to happen outdoors. It was more fun then.
     EOS
 
-    system "#{bin}/mu", "init", "--muhome=#{testpath}", "--maildir=#{testpath}"
-    system "#{bin}/mu", "index", "--muhome=#{testpath}"
+    system bin/"mu", "init", "--muhome=#{testpath}", "--maildir=#{testpath}"
+    system bin/"mu", "index", "--muhome=#{testpath}"
 
     mu_find = "#{bin}/mu find --muhome=#{testpath} "
     find_message = "#{mu_find} msgid:2222222222@example.com"
