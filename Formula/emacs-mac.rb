@@ -1,9 +1,9 @@
 class EmacsMac < Formula
   desc "GNU Emacs for Mac + extras (Based on YAMAMOTO Mitsuharu's Mac port)"
   homepage "https://github.com/choppsv1/emacs-mac"
-  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.2-mac-1.2.tar.gz"
-  version "28.2-mac-1.2"
-  sha256 "3fb9ef2b8af3f06258eab05a7c9a4fb426a904c83ac1f267a373170348f7bc88"
+  url "https://github.com/choppsv1/emacs-mac/archive/refs/tags/28.2-mac-1.3.tar.gz"
+  version "28.2-mac-1.3"
+  sha256 "da16fa21c99bdf5a00ccbf1e8d1ba9f7bdb89a8de631f9ca66550eb22c836877"
   license "GPL-3.0-or-later"
 
   head do
@@ -23,7 +23,7 @@ class EmacsMac < Formula
   depends_on "grep" => :build
   depends_on "make" => :build
   depends_on "coreutils" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "texinfo" => :build
   depends_on "xz" => :build
 
@@ -70,6 +70,7 @@ class EmacsMac < Formula
     ENV["ac_cv_func_aligned_alloc"] = "no" if MacOS.version == :mojave
 
     args = [
+      "--disable-acl",
       "--disable-silent-rules",
       "--enable-locallisppath=#{HOMEBREW_PREFIX}/share/emacs/site-lisp",
       "--enable-mac-app=#{prefix}",
