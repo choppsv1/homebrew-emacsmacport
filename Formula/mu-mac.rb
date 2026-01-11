@@ -1,12 +1,13 @@
 # NOTE: Odd release numbers indicate unstable releases.
-# Please only submit PRs for [x.x.even] version numbers:
+# Please only submit PRs for [x.even.x] version numbers:
 # https://github.com/djcb/mu/commit/23f4a64bdcdee3f9956a39b9a5a4fd0c5c2370ba
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/releases/download/v1.12.7/mu-1.12.7.tar.xz"
-  sha256 "d916ba9b8ada90996b37eedf7f5fc70c35eb77f47fd933a502fbe0dccf2a6529"
+  url "https://github.com/djcb/mu/releases/download/v1.12.14/mu-1.12.14.tar.xz"
+  sha256 "e7215beb599bfa9b511bc6a7fec51da2cb8cc1122805542e5e50c1912c01043f"
   license "GPL-3.0-or-later"
+  head "https://github.com/djcb/mu.git", branch: "master"
 
   # We restrict matching to versions with an even-numbered minor version number,
   # as an odd-numbered minor version number indicates a development version:
@@ -31,7 +32,7 @@ class MuMac < Formula
   depends_on "libtool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "texinfo" => :build
   depends_on "gettext"
   depends_on "glib"
@@ -71,13 +72,6 @@ class MuMac < Formula
     system "meson", "setup", "build", "-Dlispdir=#{elisp}", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
-  end
-
-  def caveats; <<~EOS
-    Existing mu users are recommended to run the following after upgrading:
-
-      mu index --rebuild
-  EOS
   end
 
   # Regression test for:
