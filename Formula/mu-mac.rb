@@ -4,8 +4,8 @@
 class MuMac < Formula
   desc "Tool (using emacs-mac) for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/releases/download/v1.12.14/mu-1.12.14.tar.xz"
-  sha256 "e7215beb599bfa9b511bc6a7fec51da2cb8cc1122805542e5e50c1912c01043f"
+  url "https://github.com/djcb/mu/releases/download/v1.14.1/mu-1.14.1.tar.xz"
+  sha256 "e41aa8530d01ae4696f6efc88c5e051dd8540f3ff7956918bf0976f1d6b1c2bb"
   license "GPL-3.0-or-later"
   head "https://github.com/djcb/mu.git", branch: "master"
 
@@ -27,16 +27,26 @@ class MuMac < Formula
     depends_on "automake" => :build
   end
 
-  depends_on "emacs-mac" => :build
+  option "with-emacs-plus", "Build against emacs-plus instead of emacs-mac"
+
+  if build.with?("emacs-plus")
+    depends_on "emacs-plus@30" => :build
+    # else
+    #  depends_on "emacs-mac" => :build
+  end
+
+  depends_on "cli11" => :build
   depends_on "libgpg-error" => :build
   depends_on "libtool" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
   depends_on "texinfo" => :build
+  depends_on "fmt"
   depends_on "gettext"
   depends_on "glib"
   depends_on "gmime"
+  depends_on "guile"
   depends_on "xapian"
 
   conflicts_with "mu-repo", because: "both install `mu` binaries"
@@ -72,6 +82,8 @@ class MuMac < Formula
     system "meson", "setup", "build", "-Dlispdir=#{elisp}", *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
+
+    zsh_completion.install "contrib/mu-completion.zsh" => "_mu"
   end
 
   # Regression test for:
